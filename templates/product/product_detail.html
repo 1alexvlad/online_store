@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+
+{% block title %}Детальная информация{% endblock %}
+
+
+{% block content %}
+  <div class="container">
+    <main class="pt-5">
+      <div class="row g-3">
+        <div class="col-md-5 col-lg-5 order-md-first bg-light">
+          <img class="img-fluid mx-auto d-block" alt="Responsive image" src="{{ product.image.url }}" style="max-height: 400px; object-fit: contain;" />
+        </div>
+
+        <div class="col-md-7 col-lg-7 ps-md-3 ps-lg-5">
+          <strong>{{ product.name }}</strong>
+
+          <hr />
+
+          <p><strong>{{ product.description }}</strong></p>
+          <div class="border">
+            <div class="col border-bottom">
+              <div class="row p-3">
+                <div class="col-6"><strong>Цена</strong></div>
+                <div class="col-6 text-end">
+                  <span class="h4 fw-bold">{{ product.price }} ₽</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="row p-3">
+                <div class="col-6">
+                  <label for="select"><strong>Количество</strong></label>
+                  &nbsp;<select id="select">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+
+                <div class="col-6 text-end">
+                  <button type="button" id="add-button" value="{{ product.id }}" class="btn btn-secondary btn-sm">Добавить в корзину</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+{% endblock %}

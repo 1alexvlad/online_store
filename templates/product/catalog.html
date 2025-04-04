@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{% block title %}Каталог{% endblock title %}
+
+
+{% block content %}
+
+<div class="container mt-4 mb-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100">
+                <a href="{% url 'product:product_detail' product.slug %}"><img src="{{product.image.url}}" class="card-img-top" alt="..."></a>
+                <div class="card-body ">
+                    <h5 class="card-title">{{product.name}}</h5>
+                    <h5 class="card-title">{{product.price}} ₽</h5>
+                    <p class="card-text">{{product.description|truncatechars:150}}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div> 
+</div>
+{% endblock content %}
