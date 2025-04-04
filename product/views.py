@@ -28,3 +28,21 @@ class ProductDetail(DetailView):
         if queryset is None:
             queryset = self.get_queryset()
         return get_object_or_404(queryset, slug=self.kwargs.get(self.slug_url_kwarg))
+    
+
+class Search(ListView):
+    model = Product
+    template_name = 'product/catalog.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Product.objects.filter(name__icontains=query)
+        else:
+            return Product.objects.none()  
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q')
+        return context

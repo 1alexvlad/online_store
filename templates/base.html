@@ -15,8 +15,8 @@
             <li class="nav-item"><a href="{% url 'product:catalog' %}" class="nav-link link-body-emphasis px-2 active" aria-current="page">Каталог товаров</a></li>
           </ul>
 
-          <form class="d-flex justify-content-center" role="search">
-            <input type="search" class="form-control" placeholder="Поиск..." aria-label="Поиск">
+          <form class="d-flex justify-content-center" action="{% url 'product:search' %}" method="get">
+            <input type="search" type="text" name="q" class="form-control" placeholder="Поиск..." aria-label="Поиск">
             <button class="btn btn-outline-success" type="submit">Поиск</button>
           </form>
           <ul class="nav ms-auto">
