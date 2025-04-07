@@ -4,7 +4,9 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 from .forms import LoginForm, UserCreateForm
 
@@ -56,10 +58,10 @@ class UserLoginView(LoginView):
     
 
 def logout_user(request):
-    session_keys = list(request.session.keys())
-    for key in session_keys:
-        if key == 'session_key':
-            continue
-        del request.session[key]
     auth.logout(request)
     return redirect('product:index')
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'account/profile.html'
+    login_url = 'account:login'

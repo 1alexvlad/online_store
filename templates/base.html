@@ -22,7 +22,7 @@
           <ul class="nav ms-auto">
             {% if request.user.is_authenticated %}
               <li class="nav-item"><a href="{% url 'account:logout' %}" class="nav-link link-body-emphasis px-2">Выйти</a></li>
-              <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">Профиль</a></li>
+              <li class="nav-item"><a href="{% url 'account:profile' %}" class="nav-link link-body-emphasis px-2">Профиль</a></li>
             {% else %}
               <li class="nav-item"><a href="{% url 'account:login' %}" class="nav-link link-body-emphasis px-2">Войти</a></li>
               <li class="nav-item"><a href="{% url 'account:register' %}" class="nav-link link-body-emphasis px-2">Зарегистрироваться</a></li>
