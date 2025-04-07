@@ -20,9 +20,11 @@ INSTALLED_APPS = [
 
     "product",
     "account",
+    "carts",
 
     "crispy_forms",
     "crispy_bootstrap5",
+    "django.contrib.humanize",
 ]
 
 MIDDLEWARE = [

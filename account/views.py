@@ -65,3 +65,12 @@ def logout_user(request):
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'account/profile.html'
     login_url = 'account:login'
+
+
+class UsersCart(TemplateView):
+    template_name = 'account/users_cart.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request'] = self.request
+        return context
