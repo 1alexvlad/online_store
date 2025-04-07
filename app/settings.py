@@ -19,6 +19,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "product",
+    "account",
+
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 MIDDLEWARE = [
@@ -90,3 +94,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = '/media/'  
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+LOGIN_URL = 'account:login'
+LOGOUT_URL = 'account:logout'
+LOGIN_REDIRECT_URL = 'product:index'
+
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
