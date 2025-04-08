@@ -42,10 +42,14 @@
                 </div>
 
                 <div class="col-6 text-end">
-                  <a href="{% url 'cart:cart_add' product.slug %}">
-                    <button type="button" id="add-button" value="{{ product.id }}" class="btn btn-secondary btn-sm">Добавить в корзину</button>
-                  </a>
+                  <button type="button" 
+                          class="btn btn-secondary btn-sm add-to-cart" 
+                          data-product-slug="{{ product.slug }}"
+                          data-url="{% url 'cart:cart_add' product.slug %}">
+                    Добавить в корзину
+                  </button>
                 </div>
+                
               </div>
             </div>
           </div>
@@ -53,5 +57,51 @@
       </div>
     </main>
   </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Обработчик для кнопки "Добавить в корзину"
+  document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', async function() {
+      const url = this.dataset.url;
+      const productSlug = this.dataset.productSlug;
+      
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({})
+        });
+        
+        if (!response.ok) throw new Error('Ошибка сети');
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Показываем уведомление
+          alert('Товар добавлен в корзину!');
+          
+          // Обновляем счетчик корзины в шапке (если есть)
+          if (data.total_quantity !== undefined) {
+            const cartCounter = document.getElementById('cart-counter');
+            if (cartCounter) {
+              cartCounter.textContent = data.total_quantity;
+            }
+          }
+        } else {
+          alert(data.message || 'Ошибка при добавлении в корзину');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Произошла ошибка, попробуйте позже');
+      }
+    });
+  });
+});
+</script>
 
 {% endblock %}
