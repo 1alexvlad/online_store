@@ -68,8 +68,8 @@
                                 </div>
                                 
                                 {% if carts %}
-                                <button type="button" class="btn btn-dark btn-block btn-lg"
-                                    data-mdb-ripple-color="dark">Создать заказ</button>
+                                <a href="{% url 'orders:create_order' %}"><button type="button" class="btn btn-dark btn-block btn-lg"
+                                    data-mdb-ripple-color="dark">Создать заказ</button></a>
                                 {% endif %}
                             </div>
                         </div>
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelectorAll('.remove-from-cart').forEach(button => {
-        button.addEventListener('click', async function() {
+        button.addEventListener('click', async function() {            
             const url = this.dataset.url;
             const cartItem = this.closest('.cart-item');
             
