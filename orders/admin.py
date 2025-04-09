@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from orders.models import Order
+from orders.models import Order, OrderItem
 
 
 class OrderTabulareAdmin(admin.TabularInline):
@@ -45,3 +45,5 @@ class OrderAdmin(admin.ModelAdmin):
         "payment_on_get",
         "is_paid",
     )
+
+admin.site.register(OrderItem)

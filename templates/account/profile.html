@@ -1,8 +1,92 @@
 {% extends "base.html" %}
-
+{% load humanize %}
 
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
-<h1>История заказов</h1>
-{% endblock  %}
+<div class="container mt-5">
+    <h1 class="mb-4">История ваших заказов</h1>
+    
+    {% if orders %}
+        <div class="order-list">
+            {% for order in orders %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <h5>Заказ №{{ order.pk }}</h5>
+                        <div>
+                            <span class="badge bg-{% if order.is_paid %}success{% else %}warning{% endif %}">
+                                {% if order.is_paid %}Оплачен{% else %}Ожидает оплаты{% endif %}
+                            </span>
+                            <span class="badge bg-secondary ms-2">
+                                {{ order.created_timestamp|date:"d.m.Y H:i" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Статус:</strong> {{ order.status }}</p>
+                            <p><strong>Доставка:</strong> 
+                                {% if order.requires_delivery %}
+                                    Да ({{ order.delivery_address }})
+                                {% else %}
+                                    Самовывоз
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Телефон:</strong> {{ order.phone_number }}</p>
+                            <p><strong>Оплата:</strong> 
+                                {% if order.payment_on_get %}
+                                    При получении
+                                {% else %}
+                                    Онлайн
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <h6>Состав заказа:</h6>
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Товар</th>
+                                <th class="text-end">Цена</th>
+                                <th class="text-center">Кол-во</th>
+                                <th class="text-end">Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.order_items.all %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td class="text-end">{{ item.price|intcomma }} ₽</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">{{ item.products_price|intcomma }} ₽</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-group-divider">
+                            <tr>
+                                <th colspan="3" class="text-end">Количетсов:</th>
+                                <th class="text-end">{{ order.total_quantity }} ₽</th>
+                                <th colspan="3" class="text-end">Итого:</th>
+                                <th class="text-end">{{ order.total_price|intcomma }} ₽</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            У вас пока нет оформленных заказов.
+            <a href="{% url 'product:index' %}" class="alert-link">Перейти в каталог</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

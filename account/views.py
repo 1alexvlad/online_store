@@ -4,9 +4,11 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+
+from orders.models import Order
 
 from .forms import LoginForm, UserCreateForm
 
@@ -62,9 +64,16 @@ def logout_user(request):
     return redirect('product:index')
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(LoginRequiredMixin, ListView):
     template_name = 'account/profile.html'
+    context_object_name = 'orders'
     login_url = 'account:login'
+    
+    def get_queryset(self):
+        return Order.objects.filter(
+            user=self.request.user
+        ).prefetch_related('order_items').order_by('-created_timestamp')
+
 
 
 class UsersCart(TemplateView):
