@@ -19,16 +19,20 @@ class CreateOrderView(LoginRequiredMixin, FormView):
         try:
             user = self.request.user
             cart_items = Cart.objects.filter(user=user)
-
+            
+            payment_method = form.cleaned_data['payment_on_get']
+            
             order = Order.objects.create(
                 user=user,
                 phone_number=form.cleaned_data['phone_number'],
                 requires_delivery=bool(int(form.cleaned_data['requires_delivery'])),
                 delivery_address=form.cleaned_data['delivery_address'],
-                payment_on_get=bool(int(form.cleaned_data['payment_on_get'])),
+                payment_on_get=bool(int(payment_method)),
+                is_paid=payment_method == '0'
             )
 
             cart_items.delete()
+            messages.success(self.request, 'Заказ успешно оформлен!')
             return super().form_valid(form)
 
         except Exception as e:

@@ -45,16 +45,37 @@
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="payment_on_get"
                                 id="id_payment_on_get" value="0" checked>
-                            <label class="form-check-label" for="id_payment_on_get">Оплата
-                                картой</label>
+                            <label class="form-check-label" for="id_payment_on_get">Оплата картой</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="payment_on_get"
                                 id="id_payment_on_get" value="1">
-                            <label class="form-check-label" for="id_payment_on_get">Наличными/картой
-                                при плучении</label>
+                            <label class="form-check-label" for="id_payment_on_get">Наличными/картой при плучении</label>
                         </div>
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="id_card_number" class="form-label">Номер карты*:</label>
+                        <input type="text" class="form-control" id="id_card_number" name="card_number"
+                            placeholder="XXXX XXXX XXXX XXXX" maxlength="16"
+                            value="{% if form.card_number.value %}{{ form.card_number.value}}{% endif %}"
+                            required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_card_expiry" class="form-label">Срок действия*:</label>
+                        <input type="text" class="form-control" id="id_card_expiry" name="card_expiry"
+                            placeholder="MM/YY"
+                            value="{% if form.card_expiry.value %}{{ form.card_expiry.value}}{% endif %}"
+                            required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_card_cvv" class="form-label">CVV*:</label>
+                        <input type="text" class="form-control" id="id_card_cvv" name="card_cvv"
+                            placeholder="XXX" maxlength="4"
+                            value="{% if form.card_cvv.value %}{{ form.card_cvv.value}}{% endif %}"
+                            required>
+                    </div>
+
                 </div>
                 <button type="submit" class="btn btn-dark">Оформить заказ</button>
             </form>
