@@ -21,8 +21,8 @@
             <button class="btn btn-outline-success" type="submit">Поиск</button>
           </form>
           <ul class="nav ms-auto">
-            <li class="nav-item"><a href="{% url 'account:users-cart' %}" class="nav-link link-body-emphasis px-2">Корзина</a></li>
             {% if request.user.is_authenticated %}
+              <li class="nav-item"><a href="{% url 'account:users-cart' %}" class="nav-link link-body-emphasis px-2">Корзина</a></li>
               <li class="nav-item"><a href="{% url 'account:logout' %}" class="nav-link link-body-emphasis px-2">Выйти</a></li>
               <li class="nav-item"><a href="{% url 'account:profile' %}" class="nav-link link-body-emphasis px-2">Профиль</a></li>
             {% else %}
