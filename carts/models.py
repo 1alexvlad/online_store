@@ -19,7 +19,6 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(default=0)
-    session_key = models.CharField(max_length=32, blank=True, null=True)
     created_timestamp = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -34,4 +33,4 @@ class Cart(models.Model):
     
 
     def __str__(self):
-        return f"Корзина {self.user.username} -- Товар {self.product.name} -- Количестов {self.quantity}"
+        return f"Корзина {self.user.username} -- Товар {self.product.name} -- Количество {self.quantity}"

@@ -32,13 +32,15 @@ class CartAddView(View):
 
 class CartChangeView(View):
     def post(self, request, product_slug):
-        
         product = get_object_or_404(Product, slug=product_slug)
         cart_item = get_object_or_404(Cart, user=request.user, product=product)
         
         action = request.POST.get('action')
         
-        if action == 'decrease':
+        if action == 'increase':
+            cart_item.quantity += 1
+            cart_item.save()
+        elif action == 'decrease':
             if cart_item.quantity > 1:
                 cart_item.quantity -= 1
                 cart_item.save()
@@ -61,6 +63,7 @@ class CartChangeView(View):
             'total_quantity': carts.total_quantity(),
             'total_price': carts.total_price(),
         })
+
 
 class CartRemoveView(View):
     def post(self, request, cart_id):

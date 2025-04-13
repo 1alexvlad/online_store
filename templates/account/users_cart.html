@@ -30,15 +30,19 @@
                                         <h6 class="text-muted">{{ cart.product.name }}</h6>
                                     </div>
                                     <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                                        <button class="btn btn-link px-2 decrease-quantity" 
+                                        <button class="btn btn-link px-2 change-quantity" 
+                                                data-action="decrease"
                                                 data-product-slug="{{ cart.product.slug }}"
-                                                data-url="{% url 'cart:cart_change' cart.product.slug %}">
+                                                data-url="{% url 'carts:cart_change' cart.product.slug %}">
                                             <i class="fas fa-minus">-</i>
                                         </button>
+
                                         <span class="quantity form-control text-center mx-2">{{ cart.quantity }}</span>
-                                        <button class="btn btn-link px-2 increase-quantity" 
+
+                                        <button class="btn btn-link px-2 change-quantity" 
+                                                data-action="increase"
                                                 data-product-slug="{{ cart.product.slug }}"
-                                                data-url="{% url 'cart:cart_add' cart.product.slug %}">
+                                                data-url="{% url 'carts:cart_change' cart.product.slug %}">
                                             <i class="fas fa-plus">+</i>
                                         </button>
                                     </div>
@@ -64,7 +68,7 @@
                                 <h6>Итого <span id="total-quantity">{{ carts.total_quantity }}</span> товаров</h6>
                                 <div class="d-flex justify-content-between mb-5">
                                     <h5 class="text-uppercase">Итоговая сумма</h5>
-                                    <h5 id="total-price">{{ carts.total_price|intcomma }} ₽</h5>
+                                    <h5 id="total-price">{{ carts.total_price }} ₽</h5>
                                 </div>
                                 
                                 {% if carts %}
@@ -82,110 +86,129 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Улучшенная функция для AJAX-запросов
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue || '';
+    }
+
     async function sendCartRequest(url, data = {}) {
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-CSRFToken': getCSRFToken(),
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: new URLSearchParams(data).toString()
             });
             
-            if (!response.ok) throw new Error('Network error');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         } catch (error) {
-            console.error('Cart error:', error);
+            console.error('Cart request error:', error);
             return {success: false, message: 'Ошибка при обновлении корзины'};
         }
     }
 
-    function updateCartUI(data, cartItem) {
-        // Обновление количества товара
-        const quantityElement = cartItem.querySelector('.quantity');
-        if (quantityElement && data.item_quantity !== undefined) {
-            quantityElement.textContent = data.item_quantity;
+    function updateCartUI(data, cartItem = null) {
+        // Если элемент корзины удален, обновляем только общие суммы
+        if (cartItem && data.item_quantity !== undefined) {
+            const quantityElement = cartItem.querySelector('.quantity');
+            if (quantityElement) {
+                quantityElement.textContent = data.item_quantity;
+            }
+            
+            const itemTotalElement = cartItem.querySelector('.item-total');
+            if (itemTotalElement && data.item_price !== undefined) {
+                itemTotalElement.textContent = `${data.item_price.toLocaleString()} ₽`;
+            }
         }
         
-        const itemTotalElement = cartItem.querySelector('.item-total');
-        if (itemTotalElement && data.item_price !== undefined) {
-            itemTotalElement.textContent = data.item_price.toLocaleString() + ' ₽';
+        if (data.total_quantity !== undefined) {
+            const totalQuantityElement = document.getElementById('total-quantity');
+            if (totalQuantityElement) {
+                totalQuantityElement.textContent = data.total_quantity;
+            }
         }
         
-        const totalQuantityElement = document.getElementById('total-quantity');
-        if (totalQuantityElement && data.total_quantity !== undefined) {
-            totalQuantityElement.textContent = data.total_quantity;
-        }
-        
-        const totalPriceElement = document.getElementById('total-price');
-        if (totalPriceElement && data.total_price !== undefined) {
-            totalPriceElement.textContent = data.total_price.toLocaleString() + ' ₽';
+        if (data.total_price !== undefined) {
+            const totalPriceElement = document.getElementById('total-price');
+            if (totalPriceElement) {
+                totalPriceElement.textContent = `${data.total_price.toLocaleString()} ₽`;
+            }
         }
     }
 
-    document.querySelectorAll('.increase-quantity').forEach(button => {
-        button.addEventListener('click', async function() {
-            const url = this.dataset.url;
-            const cartItem = this.closest('.cart-item');
-            
-            try {
-                const data = await sendCartRequest(url);
-                if (data.success) {
-                    updateCartUI(data, cartItem);
-                } else {
-                    alert(data.message);
+    async function handleQuantityChange(event) {
+        const button = event.currentTarget;
+        const action = button.dataset.action;
+        const url = button.dataset.url;
+        const cartItem = button.closest('.cart-item');
+        
+        try {
+            const data = await sendCartRequest(url, {action: action});
+            if (data.success) {
+                updateCartUI(data, cartItem);
+                if (data.item_quantity <= 0 && cartItem) {
+                    cartItem.remove();
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Произошла ошибка при добавлении товара');
+            } else {
+                alert(data.message || 'Произошла ошибка');
             }
-        });
-    });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Произошла ошибка при изменении количества');
+        }
+    }
 
-    document.querySelectorAll('.decrease-quantity').forEach(button => {
-        button.addEventListener('click', async function() {
-            const url = this.dataset.url;
-            const cartItem = this.closest('.cart-item');
-            
-            try {
-                const data = await sendCartRequest(url, {action: 'decrease'});
-                if (data.success) {
-                    updateCartUI(data, cartItem);
-                    if (data.item_quantity <= 0) {
-                        cartItem.remove();
-                    }
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Произошла ошибка при уменьшении количества');
+    async function handleRemoveItem(event) {
+        const button = event.currentTarget;
+        const url = button.dataset.url;
+        const cartItem = button.closest('.cart-item');
+        
+        try {
+            const data = await sendCartRequest(url);
+            if (data.success) {
+                cartItem.remove();
+                updateCartUI(data);
+            } else {
+                alert(data.message || 'Произошла ошибка при удалении');
             }
-        });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Произошла ошибка при удалении товара');
+        }
+    }
+
+    document.querySelectorAll('[data-action="increase"], [data-action="decrease"]').forEach(button => {
+        button.addEventListener('click', handleQuantityChange);
     });
 
     document.querySelectorAll('.remove-from-cart').forEach(button => {
-        button.addEventListener('click', async function() {            
-            const url = this.dataset.url;
-            const cartItem = this.closest('.cart-item');
-            
-            try {
-                const data = await sendCartRequest(url);
-                if (data.success) {
-                    cartItem.remove();
-                    updateCartUI(data, cartItem);
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Произошла ошибка при удалении товара');
-            }
-        });
+        button.addEventListener('click', handleRemoveItem);
     });
+
+    async function initializeCart() {
+        try {
+            const response = await fetch('/api/cart/summary/', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                updateCartUI(data);
+            }
+        } catch (error) {
+            console.error('Cart initialization error:', error);
+        }
+    }
+
+    initializeCart();
 });
 </script>
     

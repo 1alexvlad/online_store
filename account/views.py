@@ -3,9 +3,10 @@ from django.contrib.auth.models import auth
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 
 from orders.models import Order
@@ -38,12 +39,6 @@ class UserLoginView(LoginView):
     template_name = 'account/login.html'
     form_class = LoginForm
     success_url = reverse_lazy('product:index')
-
-    def get_success_url(self) -> str:
-        redirect_page = self.request.POST.get('next', None)
-        if redirect_page and redirect_page != reverse('user:logout'):
-            return redirect_page
-        return reverse_lazy('product:index')    
     
     def form_valid(self, form):
 
@@ -58,7 +53,8 @@ class UserLoginView(LoginView):
         context = super().get_context_data(**kwargs)
         return context   
     
-
+    
+@login_required
 def logout_user(request):
     auth.logout(request)
     return redirect('product:index')

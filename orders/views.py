@@ -62,4 +62,4 @@ class CreateOrderView(FormView):
             
         except Exception as e:
             messages.error(self.request, f'Ошибка: {str(e)}')
-            return redirect('cart:order')
+            return redirect('product:index')  
